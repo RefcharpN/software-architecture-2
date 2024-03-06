@@ -1,0 +1,18 @@
+{
+  "name": "Neo4jSinkConnectorConnector_0",
+  "config": {
+    "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+    "tasks.max": "1",
+    "errors.retry.timeout": "-1",
+    "errors.retry.delay.max.ms": "1000",
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "mirea.public.institute",
+    "neo4j.authentication.basic.username": "neo4j",
+    "neo4j.authentication.basic.password": "2517Pass!Part",
+    "neo4j.server.uri": "bolt://neo4j:7687",
+    "neo4j.encryption.enabled": "false",
+    "neo4j.topic.cypher.mirea.public.institute": "MERGE (i:Institute {id: coalesce(event.before.id, event.after.id)}) ON CREATE SET i.title = event.after.title ON MATCH SET i.title = event.after.title WITH i WHERE event.op = 'd' DETACH DELETE i"
+  }
+}

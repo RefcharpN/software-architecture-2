@@ -1,0 +1,18 @@
+{
+  "name": "Neo4jSinkConnectorTimestamps_Update",
+  "config": {
+    "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+    "tasks.max": "1",
+    "errors.retry.timeout": "-1",
+    "errors.retry.delay.max.ms": "1000",
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "mirea.public.timestamps",
+    "neo4j.authentication.basic.username": "neo4j",
+    "neo4j.authentication.basic.password": "2517Pass!Part",
+    "neo4j.server.uri": "bolt://neo4j:7687",
+    "neo4j.encryption.enabled": "false",
+    "neo4j.topic.cypher.mirea.public.timestamps": "WITH event WHERE event.op = 'u' MATCH (t:Timestamps {id: event.before.id}) SET t.logdate = event.after.logdate, t.cabinet = event.after.cabinet, t.week = event.after.week, t.hours = event.after.hours, t.teachers_fio = event.after.teachers_fio, t.lecture_id = event.after.lecture_id, t.group_id = event.after.group_id WITH t, event MATCH (l:Lecture {id: event.before.lecture_id})-[k:HAS_TIMESTAMP]->(t)<-[q:HAS_TIMESTAMP]-(g:Group {id: event.before.group_id}) DETACH DELETE k, q WITH t, event MATCH (l_new:Lecture {id: event.after.lecture_id}), (g_new:Group {id: event.after.group_id}) MERGE (l_new)-[:HAS_TIMESTAMP]->(t)<-[:HAS_TIMESTAMP]-(g_new)"
+  }
+}
