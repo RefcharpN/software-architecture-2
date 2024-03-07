@@ -5,8 +5,8 @@ import psycopg2
 database_name = "mirea"
 user_name = "postgres"
 password = "2517Pass!Part"
-host_ip = "25.8.8.1"
-# host_ip = "localhost"
+# host_ip = "25.8.8.1"
+host_ip = "localhost"
 host_port = "5432"
 
 my_db_con = psycopg2.connect(

@@ -58,6 +58,7 @@ services:
         ports:
             - 8083:8083
         environment:
+            CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components,/data/connect-jars,/var/lib/kafka-connect/data
             CONNECT_BOOTSTRAP_SERVERS: "broker:29092"
             CONNECT_REST_PORT: 8083
             CONNECT_GROUP_ID: kafka-connect
@@ -72,7 +73,6 @@ services:
             CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
             CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
             CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-            CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components,/data/connect-jars
         command:
             - bash
             - -c
@@ -82,9 +82,6 @@ services:
                 confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:latest
                 confluent-hub install --no-prompt neo4j/kafka-connect-neo4j:latest
                 confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:latest
-                confluent-hub install --no-prompt jcustenborder/kafka-connect-redis:0.0.5
-                confluent-hub install --no-prompt redis/redis-kafka-connect:0.9.0
-                confluent-hub install --no-prompt redis/redis-enterprise-kafka:6.7.4
                 #
                 echo "Launching Kafka Connect worker"
                 /etc/confluent/docker/run &
@@ -93,7 +90,7 @@ services:
         volumes:
             - ./data/kafka-connect/lib:/var/lib/kafka-connect/data
             - ./data/kafka-connect/data:/data
-            
+            - ./data/kafka-connect/plugin:/data/connect-jars
 
 
     ksqldb:
@@ -215,7 +212,6 @@ services:
           - ./data/redis/data:/data
           - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf
         environment:
-          - REDIS_PASSWORD=2517Pass
           - REDIS_PORT=6379
           - REDIS_DATABASES=16
 
