@@ -1,0 +1,16 @@
+{
+  "name": "MongoSinkConnectorConnector_101",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
+    "tasks.max": "1",
+    "transforms": "unwrap",
+    "topics": "mirea.public.institute, mirea.public.cafedra, mirea.public.spec",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "connection.uri": "mongodb://root:2517Pass!Part@mongo:27017/",
+    "database": "db_mirea",
+    "document.id.strategy": "com.mongodb.kafka.connect.sink.processor.id.strategy.BsonOidStrategy",
+    "document.id.strategy.partial.value.projection.type": "allowlist",
+    "document.id.strategy.partial.value.projection.list": "id"
+  }
+}
