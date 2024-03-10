@@ -178,6 +178,7 @@ services:
             - ./data/neo/neo4j-logs:/logs
             - ./data/neo/neo4j-conf:/conf
             - ./data/neo/neo4j-data:/data
+            - ./data/neo-plugin:/plugins
 
     mongo:
         container_name: mongo
