@@ -12,6 +12,7 @@ database_name = "mirea"
 user_name = "postgres"
 password = "2517Pass!Part"
 host_ip = "localhost"
+# host_ip = "25.8.8.1"
 host_port ="5432"
 
 connection = psycopg2.connect(
@@ -395,5 +396,36 @@ visits_values = ", ".join(["%s"] * len(visits_data))
 insert_query = (f"INSERT INTO public.visits (student_id,visited,timetable_id,date_visit) VALUES {visits_values}")
 
 cursor.execute(insert_query, visits_data)
+
+file = open("./lecture_text/random_text.txt", "r")
+texts = file.readlines()
+
+kolvo_materials = 100
+get_array_lecture_id = "SELECT array_agg(id) FROM public.lecture"
+cursor.execute(get_array_lecture_id)
+array_lecture_ids=cursor.fetchall()
+
+def get_lecture_id():
+    l_id = random.randint(0,len(array_lecture_ids[0][0])-1)
+    lecture_id = array_lecture_ids[0][0][l_id]
+    return lecture_id
+
+cursor.execute('''CREATE TABLE public.materials
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    lecture_id integer,
+    material text,
+    
+    CONSTRAINT materials_pkey PRIMARY KEY (id),
+    CONSTRAINT materials_lecture_id_fkey FOREIGN KEY (lecture_id)
+        REFERENCES public.lecture (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);''')
+
+for i in range(kolvo_materials):
+    insert_query = (f"INSERT INTO public.materials (lecture_id,material) VALUES ({get_lecture_id()}, '{random.choice(texts)}');")
+    cursor.execute(insert_query, visits_data)
+
 
 print("Postrges fill")

@@ -8,7 +8,7 @@
     "errors.tolerance": "all",
     "errors.log.enable": "true",
     "errors.log.include.messages": "true",
-    "topics": "confluent_rmoff_01ksql_processing_log, mirea.public.students, mirea.public.lecture",
+    "topics": "mirea.public.materials, mirea.public.lecture",
     "connection.url": "http://elasticsearch:9200/",
     "key.ignore": "true"
   }
