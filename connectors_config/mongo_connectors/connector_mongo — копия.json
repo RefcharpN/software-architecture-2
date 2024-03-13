@@ -9,8 +9,6 @@
     "transforms.unwrap.drop.tombstones": "false",
     "connection.uri": "mongodb://root:2517Pass!Part@mongo:27017/",
     "database": "db_mirea",
-    "change.data.capture.handler":"com.mongodb.kafka.connect.sink.cdc.mongodb.CustomCdcHandler"
-
-
+    "change.data.capture.handler":"com.mongodb.kafka.connect.sink.cdc.debezium.rdbms.postgres.PostgresHandler"
   }
 }
