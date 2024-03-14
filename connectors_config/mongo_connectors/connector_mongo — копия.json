@@ -1,5 +1,5 @@
 {
-  "name": "MongoSinkConnectorConnector_101",
+  "name": "MongoSink",
   "config": {
     "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
     "tasks.max": "1",
@@ -9,6 +9,6 @@
     "transforms.unwrap.drop.tombstones": "false",
     "connection.uri": "mongodb://root:2517Pass!Part@mongo:27017/",
     "database": "db_mirea",
-    "change.data.capture.handler":"com.mongodb.kafka.connect.sink.cdc.debezium.rdbms.postgres.PostgresHandler"
+    "change.data.capture.handler":"com.mongodb.kafka.connect.sink.cdc.CustomCdcHandler"
   }
 }

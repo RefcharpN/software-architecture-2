@@ -81,7 +81,6 @@ services:
                 confluent-hub install --no-prompt debezium/debezium-connector-postgresql:latest
                 confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:latest
                 confluent-hub install --no-prompt neo4j/kafka-connect-neo4j:latest
-                confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:latest
                 #
                 echo "Launching Kafka Connect worker"
                 /etc/confluent/docker/run &
