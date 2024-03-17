@@ -1,3 +1,4 @@
+import pymongo
 from elasticsearch import Elasticsearch, helpers
 from neo4j import GraphDatabase
 import psycopg2
@@ -43,13 +44,10 @@ redis = redis.Redis(host= 'localhost', port= '6379', db=0)
 
 
 #Mongo
-CONNECTION_STRING = "mongodb://root:2517Pass!Part@localhost:27017/?authMechanism=DEFAULT"
+client = pymongo.MongoClient("mongodb://root:2517Pass!Part@localhost:27017/?authMechanism=DEFAULT")  # Замените на ваш URL
+db = client["db_mirea"]  # Замените на название вашей базы данных
+collection = db["smelkin"]  # Замените на название вашей коллекции
 # CONNECTION_STRING = "mongodb://root:2517Pass!Part@25.8.8.1:27017/?authMechanism=DEFAULT"
-
-client = MongoClient(CONNECTION_STRING)
-
-db = client.smelkin
-collection = db.institute
 
 # Значения для запроса
 semestr_for_query = 1 # 1 или 2
@@ -75,11 +73,11 @@ print(discip_names)
 #id занятий которые проводятся в x семестре y года +
 lec_id=[]
 with graphDB_Driver.session() as neo_session:
-        lec_id.append(neo_session.run("MATCH (d:Disciplines)--(l:Lecture)--(tt:TimeTable) WHERE d.technical<>'' and tt.lecture_id=l.iid and date($start) <= date(tt.date) and date(tt.date)<date($end) RETURN  l.iid",start=str(detes_period[0]),end=str(detes_period[1])).data())
+        lec_id.append(neo_session.run("MATCH (d:Disciplines)--(l:Lecture)--(tt:TimeTable) WHERE d.technical<>'' and tt.lecture_id=l.id RETURN  l.id",start=str(detes_period[0]),end=str(detes_period[1])).data())
 
 lec_ids=[]
 for i in range(len(lec_id[0])):
-        lec_ids.append((lec_id[0][i]['l.iid']))
+        lec_ids.append((lec_id[0][i]['l.id']))
 print(lec_ids)
 #TODO:объединение в один запрос без цикла ниже
 
@@ -88,7 +86,7 @@ array = []
 
 with graphDB_Driver.session() as neo_session:
     for disc in discip_names:
-        count_st=(neo_session.run("MATCH (d:Disciplines)--(l:Lecture)--(tt:TimeTable)--(gr:Group)--(st:Student) WHERE d.name = $name and l.iid in $lec RETURN count (distinct st)",name=disc,lec=(lec_ids)).data())
+        count_st=(neo_session.run("MATCH (d:Disciplines)--(l:Lecture)--(tt:TimeTable)--(gr:Group)--(st:Student) WHERE d.name = $name and l.id in $lec RETURN count (distinct st)",name=disc,lec=(lec_ids)).data())
         count = (count_st[0]['count (distinct st)'])
         array.append((disc,count))
 print(array)
@@ -96,11 +94,34 @@ print(array)
 # #формирование отчёта
 print("\nОтчет:")
 for line in array:
-    cur=(collection.find({"institute.cafedras.specialnosts.disciplines.name": line[0]}))
-    for document in cur:
-        print("\nДисциплина:",document['institute'][0]['cafedras'][0]['specialnosts'][0]['disciplines'][0]['name'])
+    def find_discipline(collection, discipline_name):
+        pipeline = [
+            {"$unwind": "$kafedras"},
+            {"$unwind": "$kafedras.specialnosts"},
+            {"$unwind": "$kafedras.specialnosts.disciplines"},
+            {"$match": {"kafedras.specialnosts.disciplines.name": discipline_name}}
+        ]
+        discipline = list(collection.aggregate(pipeline))
+        if discipline:
+            institute_name = discipline[0]["name"]
+            kafedra = discipline[0]["kafedras"]
+            specialnost = kafedra["specialnosts"]
+            discipline = specialnost["disciplines"]
+            return kafedra, specialnost, discipline, institute_name
+        return None, None, None, None
+
+
+    # Поиск и вывод информации о дисциплине
+    kafedra, specialnost, discipline, institute_name = find_discipline(collection, line[0])
+
+    if discipline:
+        print("\nНайдена дисциплина:",  line[0])
         print("Слушателей: "+str(line[1])+" за "+str(semestr_for_query)+" семестр "+str(year_for_query)+" года")
-        print("Институт:",document['institute'][0]['name'])
-        print("\tКафедра:",document['institute'][0]['cafedras'][0]['name'])
-        print("\tСпециальность:",document['institute'][0]['cafedras'][0]['specialnosts'][0]['name'])
-        print("\tТехническое оборудование:",document['institute'][0]['cafedras'][0]['specialnosts'][0]['disciplines'][0]['technical'])
+        print("Подробнее:")
+        print("\tинститут:", institute_name)
+        print("\tКафедра:", kafedra["name"])
+        print("\tСпециальность:", specialnost["name"])
+        print("\tТехнические требования:", discipline["technical"])
+        print("\tОписание курса:", discipline["description"])
+    else:
+        print("Дисциплина",  line[0], "не найдена.")
