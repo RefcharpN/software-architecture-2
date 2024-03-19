@@ -30,13 +30,13 @@ cursor = connection.cursor()
 cursor.execute('''CREATE TABLE public.institute  
     (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    name character varying(256) COLLATE pg_catalog."default",
+    name text,
     CONSTRAINT institute_pkey PRIMARY KEY (id));''')
 
 alter_table_cafedra = "ALTER TABLE institute REPLICA IDENTITY FULL"
 cursor.execute(alter_table_cafedra)
 
-institutes_array = ['ИКБ','ИИИ']
+institutes_array = ["ИКБ","ИИИ"]
 institute_data = []
 for i in range(len(institutes_array)):
     institute_data.append((institutes_array[i]))
@@ -148,7 +148,7 @@ cursor.execute(query_group, group_data)
 cursor.execute('''CREATE TABLE public.students
 (
     id_stud_code integer NOT NULL,
-    fio character varying COLLATE pg_catalog."default",
+    fio text,
     group_id integer,
     CONSTRAINT student_pkey PRIMARY KEY (id_stud_code),
     CONSTRAINT student_group_id_fkey FOREIGN KEY (group_id)
@@ -175,7 +175,7 @@ array_ids=cursor.fetchall()
 
 for _ in range(kolvo_students):
     stud_code = get_stud_code()
-    fio = fake.name()
+    fio = str(fake.name())
     id = random.randint(0,len(array_ids[0][0])-1)
     group_id = array_ids[0][0][id]
     students_data.append((stud_code,fio, group_id))
